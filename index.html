@@ -32,7 +32,7 @@
   .decor--sun{inset:auto 0 0 auto; width:min(38vw,360px)}
   .layer{position:relative; z-index:1}
 
-  /* ===== 導覽：所有裝置都維持橫向，窄螢幕可左右滑動 ===== */
+  /* ===== 導覽（桌機橫向；手機用抽屜） ===== */
   .nav{
     position:sticky; top:0; z-index:50; backdrop-filter:blur(8px);
     background:color-mix(in oklab,var(--bg) 85%,white);
@@ -42,24 +42,59 @@
     max-width:var(--maxw); margin:auto; padding:10px var(--gap);
     display:flex; align-items:center; justify-content:space-between; gap:12px;
   }
-  .brand{display:none;}      /* 依你的需求隱藏品牌區塊 */
-  .nav__menu{display:none;}  /* 不顯示漢堡 */
+  .brand{display:none;}
   .nav__links{
     display:flex; align-items:center; gap:18px;
-    flex-wrap:nowrap;            /* 不換行，維持橫向 */
-    overflow-x:auto;             /* 小螢幕可以左右滑 */
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;        /* 隱藏 Firefox 捲軸 */
+    flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
     mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
   }
-  .nav__links::-webkit-scrollbar{ display:none; }  /* 隱藏 WebKit 捲軸 */
+  .nav__links::-webkit-scrollbar{ display:none; }
   .nav__links a{
-    opacity:.85; padding:8px 12px; border-radius:999px;
-    white-space:nowrap;          /* 文字不換行 */
+    opacity:.85; padding:8px 12px; border-radius:999px; white-space:nowrap;
     background:rgba(0,0,0,.03);
   }
   .nav__links a:hover{background:rgba(0,0,0,.06);opacity:1}
   .nav__cta{padding:8px 14px;border-radius:999px;background:var(--accent);color:#fff;font-weight:700}
+
+  /* === 手機抽屜式選單 === */
+  .mb-hamburger{
+    display:none; /* 桌機隱藏，手機在 media query 顯示 */
+    width:44px; height:44px; border:0; border-radius:10px;
+    background:rgba(0,0,0,.7); color:#fff; display:grid; place-items:center;
+  }
+  .mb-hamburger span{display:block; width:22px; height:2px; background:#fff; margin:3px 0; transition:.25s}
+  .mb-hamburger[aria-expanded="true"] span:nth-child(1){transform:translateY(5px) rotate(45deg)}
+  .mb-hamburger[aria-expanded="true"] span:nth-child(2){opacity:0}
+  .mb-hamburger[aria-expanded="true"] span:nth-child(3){transform:translateY(-5px) rotate(-45deg)}
+
+  .mb-drawer{
+    position:fixed; inset:0; z-index:200; display:grid; place-items:center;
+    visibility:hidden; opacity:0; transition:opacity .25s ease, visibility .25s ease;
+  }
+  .mb-drawer.is-open{visibility:visible; opacity:1}
+  .mb-drawer__backdrop{position:absolute; inset:0; background:rgba(0,0,0,.55); backdrop-filter:blur(2px)}
+  .mb-drawer__panel{
+    position:relative; width:min(92vw,360px); background:#111; color:#fff;
+    border-radius:14px; padding:22px 16px 10px; box-shadow:0 30px 80px rgba(0,0,0,.35);
+    transform:translateY(10px) scale(.98); opacity:.97; transition:.25s ease;
+  }
+  .mb-drawer.is-open .mb-drawer__panel{transform:none; opacity:1}
+  .mb-drawer__title{ text-align:center; font-weight:700; letter-spacing:.1em; opacity:.8; margin-bottom:6px; }
+  .mb-drawer__list{ list-style:none; margin:0; padding:8px 0 12px; }
+  .mb-drawer__list li{ border-top:1px solid rgba(255,255,255,.06) }
+  .mb-drawer__list li:first-child{ border-top:0 }
+  .mb-drawer__list a{ display:block; padding:16px 10px; text-align:center; color:#fff; text-decoration:none }
+  .mb-drawer__list a:hover{ background:rgba(255,255,255,.06) }
+  .mb-drawer__close{ position:absolute; right:10px; top:8px; border:0; background:transparent; color:#fff; font-size:20px; line-height:1; opacity:.85; cursor:pointer }
+  .mb-drawer__close:hover{ opacity:1 }
+  .body-lock{ overflow:hidden; touch-action:none }
+
+  /* 手機顯示抽屜、隱藏橫排 */
+  @media (max-width:900px){
+    .nav__links{ display:none; }
+    .mb-hamburger{ display:grid; }
+  }
 
   /* Layout */
   section{padding:clamp(56px,10vw,120px) var(--gap)}
@@ -73,16 +108,8 @@
     font-size:clamp(40px,7vw,92px); line-height:1.06; letter-spacing:.5px; font-weight:800;
   }
   h1 .en{display:block; line-height:1.05}
-  /* 中文標題固定同一行（與英文分兩塊） */
-  h1 .zh{
-    display:block;
-    white-space:nowrap;   /* 不自動換行 */
-    word-break:keep-all;  /* CJK 不逐字斷行 */
-    line-height:1.05;
-  }
-  @media (max-width:780px){
-    h1 .zh{ font-size:clamp(26px,7vw,52px); }
-  }
+  h1 .zh{display:block; white-space:nowrap; word-break:keep-all; line-height:1.05;}
+  @media (max-width:780px){ h1 .zh{ font-size:clamp(26px,7vw,52px); } }
 
   h2{font-size:clamp(28px,4vw,44px);font-weight:800}
   .lead{font-size:clamp(16px,2.1vw,22px);color:#222;max-width:820px}
@@ -106,45 +133,25 @@
   .quote{font-size:clamp(18px,2.2vw,24px);font-weight:700}
   @media (max-width:900px){.about__grid{grid-template-columns:1fr}}
 
-  /* Flow（齊頭對齊 + JS 微調） */
+  /* Flow */
   .flow-graphic{background:linear-gradient(to bottom,transparent,#fff 40%,#fff); border-top:1px solid rgba(0,0,0,.08)}
   .fg-title{margin:0 0 28px; font-size:clamp(28px,4.5vw,42px); font-weight:800}
   .fg-steps{list-style:none; margin:0; padding:0; position:relative; display:grid; gap:28px}
-  .fg-steps::before{
-    content:""; position:absolute; left:50%; top:0; bottom:0; width:2px;
-    background: linear-gradient(var(--flow), var(--flow)); transform:translateX(-50%); opacity:.35;
-  }
-  .fg-step{display:grid; grid-template-columns: 1fr 120px 1fr; gap:22px; align-items:start;}
-  .fg-card{
-    grid-column:1; background:#fff; border:1px solid rgba(0,0,0,.08);
-    border-left:6px solid var(--flow); border-radius:14px; padding:18px 18px 14px;
-    box-shadow:0 14px 30px rgba(0,0,0,.06)
-  }
-  .fg-step:nth-child(odd) .fg-card{ grid-column:3 } /* 1/3/5 在右邊 */
+  .fg-steps::before{content:""; position:absolute; left:50%; top:0; bottom:0; width:2px; background: linear-gradient(var(--flow), var(--flow)); transform:translateX(-50%); opacity:.35}
+  .fg-step{display:grid; grid-template-columns:1fr 120px 1fr; gap:22px; align-items:start;}
+  .fg-card{grid-column:1; background:#fff; border:1px solid rgba(0,0,0,.08); border-left:6px solid var(--flow); border-radius:14px; padding:18px 18px 14px; box-shadow:0 14px 30px rgba(0,0,0,.06)}
+  .fg-step:nth-child(odd) .fg-card{ grid-column:3 }
   .fg-card h3{ margin:0 0 6px; font-size:20px }
   .fg-card p{ margin:0; color:var(--ink) }
-  .fg-tag{ display:inline-block; margin-top:10px; font-size:12px; color:#2f2f2f; background:#e9f3e4;
-    border:1px solid color-mix(in oklab,var(--flow) 70%, #000 0%); padding:4px 8px; border-radius:999px }
-
-  .fg-center{
-    grid-column:2; justify-self:center; display:grid; gap:10px; place-items:center;
-    align-self:start;
-    --fgOffset: 0px;
-    transform: translateY(var(--fgOffset));
-    will-change: transform;
-  }
-  .fg-badge{
-    width:86px; height:86px; border-radius:50%; display:grid; place-items:center;
-    background:radial-gradient(circle at 30% 30%,#ffffff 0 30%,#f7fbf4 31% 100%);
-    border:2px solid color-mix(in oklab,var(--flow) 80%, #000 0%); box-shadow:0 6px 16px rgba(0,0,0,.08);
-  }
+  .fg-tag{ display:inline-block; margin-top:10px; font-size:12px; color:#2f2f2f; background:#e9f3e4; border:1px solid color-mix(in oklab,var(--flow) 70%, #000 0%); padding:4px 8px; border-radius:999px }
+  .fg-center{ grid-column:2; justify-self:center; display:grid; gap:10px; place-items:center; align-self:start; --fgOffset:0px; transform:translateY(var(--fgOffset)); will-change:transform }
+  .fg-badge{ width:86px; height:86px; border-radius:50%; display:grid; place-items:center; background:radial-gradient(circle at 30% 30%,#ffffff 0 30%,#f7fbf4 31% 100%); border:2px solid color-mix(in oklab,var(--flow) 80%,#000 0%); box-shadow:0 6px 16px rgba(0,0,0,.08) }
   .fg-badge span{ font-size:12px; letter-spacing:.2em; color:var(--flow) }
   .fg-badge strong{ font-size:26px; color:var(--flow); line-height:1 }
   .fg-icon{ width:42px; height:42px; opacity:.75 }
   .fg-icon svg{ width:100%; height:100%; stroke: color-mix(in oklab, var(--flow) 78%, #000 0%); stroke-width:2; fill:none; stroke-linecap:round; stroke-linejoin:round }
-
   @media (max-width:780px){
-    .fg-step{ grid-template-columns: 72px 1fr }
+    .fg-step{ grid-template-columns:72px 1fr }
     .fg-steps::before{ left:36px; transform:none }
     .fg-center{ grid-column:1 }
     .fg-badge{ width:66px; height:66px }
@@ -154,18 +161,15 @@
 
   /* Portfolio */
   .portfolio .grid{display:grid; gap:var(--gap); grid-template-columns:repeat(3,1fr)}
-  .ph{aspect-ratio:4/3; border:1px dashed rgba(0,0,0,.18); border-radius:14px; display:grid; place-items:center; color:var(--muted);
-      background:linear-gradient(135deg, rgba(0,0,0,.04), rgba(255,255,255,.6)); position:relative; overflow:hidden}
-  .ph::after{content:"待上傳"; position:absolute; bottom:10px; right:12px; font-size:12px; color:rgba(0,0,0,.45); background:#fff;
-      padding:4px 8px; border-radius:999px; border:1px solid rgba(0,0,0,.1)}
+  .ph{aspect-ratio:4/3; border:1px dashed rgba(0,0,0,.18); border-radius:14px; display:grid; place-items:center; color:var(--muted); background:linear-gradient(135deg, rgba(0,0,0,.04), rgba(255,255,255,.6)); position:relative; overflow:hidden}
+  .ph::after{content:"待上傳"; position:absolute; bottom:10px; right:12px; font-size:12px; color:rgba(0,0,0,.45); background:#fff; padding:4px 8px; border-radius:999px; border:1px solid rgba(0,0,0,.1)}
   .ph img{width:100%; height:100%; object-fit:cover}
   @media (max-width:980px){ .portfolio .grid{ grid-template-columns:repeat(2,1fr) } }
   @media (max-width:560px){ .portfolio .grid{ grid-template-columns:1fr } }
 
   /* CTA / Footer */
   .cta{text-align:center; border-top:1px solid rgba(0,0,0,.08); background:color-mix(in oklab,#fff 88%, var(--bg))}
-  .cta .card{margin:auto; max-width:820px; border:1px solid rgba(0,0,0,.1); background:white;
-    padding:clamp(20px,4vw,36px); border-radius:20px; box-shadow:0 20px 50px rgba(0,0,0,.06)}
+  .cta .card{margin:auto; max-width:820px; border:1px solid rgba(0,0,0,.1); background:white; padding:clamp(20px,4vw,36px); border-radius:20px; box-shadow:0 20px 50px rgba(0,0,0,.06)}
   .btn{display:inline-block; padding:12px 18px; border-radius:999px; background:#111; color:#fff; font-weight:800}
   .btn--ghost{background:transparent; border:1px solid rgba(0,0,0,.2); color:#111}
   footer{padding:36px var(--gap); border-top:1px solid rgba(0,0,0,.08); color:var(--muted); font-size:14px}
@@ -187,15 +191,9 @@
     h1{line-height:1.08} h2{line-height:1.15}
   }
   @supports (padding:max(0px)){
-    body{
-      padding-left:max(0px, env(safe-area-inset-left));
-      padding-right:max(0px, env(safe-area-inset-right));
-    }
+    body{ padding-left:max(0px, env(safe-area-inset-left)); padding-right:max(0px, env(safe-area-inset-right)); }
   }
-  :focus-visible{
-    outline:3px solid color-mix(in oklab, var(--flow) 70%, #000 0%);
-    outline-offset:3px;
-  }
+  :focus-visible{ outline:3px solid color-mix(in oklab, var(--flow) 70%, #000 0%); outline-offset:3px; }
 </style>
 </head>
 <body>
@@ -234,7 +232,7 @@
   </div>
 
   <div class="layer">
-    <!-- 導覽（橫向＋可滑動） -->
+    <!-- 導覽（桌機橫向；手機抽屜） -->
     <nav class="nav">
       <div class="nav__inner">
         <div class="brand"></div>
@@ -245,9 +243,29 @@
           <a href="#portfolio">作品集</a>
           <a href="#contact" class="nav__cta">預約初談</a>
         </div>
-        <div class="nav__menu" aria-hidden="true"></div>
+
+        <!-- 手機漢堡按鈕 -->
+        <button class="mb-hamburger" id="mbHamburger" aria-label="開啟選單" aria-controls="mbDrawer" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
       </div>
     </nav>
+
+    <!-- 手機抽屜式選單 -->
+    <div class="mb-drawer" id="mbDrawer" aria-hidden="true">
+      <div class="mb-drawer__backdrop" data-close></div>
+      <nav class="mb-drawer__panel" role="dialog" aria-modal="true">
+        <div class="mb-drawer__title">Menu</div>
+        <ul class="mb-drawer__list">
+          <li><a href="#home" data-close>Home</a></li>
+          <li><a href="#about" data-close>公司簡介</a></li>
+          <li><a href="#flow" data-close>服務流程</a></li>
+          <li><a href="#portfolio" data-close>作品集</a></li>
+          <li><a href="#contact" data-close>預約初談</a></li>
+        </ul>
+        <button class="mb-drawer__close" type="button" aria-label="關閉選單" data-close>✕</button>
+      </nav>
+    </div>
 
     <!-- Home -->
     <section id="home" class="hero">
@@ -421,9 +439,41 @@
   window.addEventListener('load', alignFlow);
   window.addEventListener('resize', ()=>{ requestAnimationFrame(alignFlow); });
   window.addEventListener('orientationchange', ()=>{ setTimeout(alignFlow, 50); });
+
+  // === 手機抽屜選單 ===
+  (function(){
+    const btn   = document.getElementById('mbHamburger');
+    const layer = document.getElementById('mbDrawer');
+    if(!btn || !layer) return;
+
+    function openDrawer(){
+      layer.classList.add('is-open');
+      btn.setAttribute('aria-expanded','true');
+      document.body.classList.add('body-lock');
+    }
+    function closeDrawer(){
+      layer.classList.remove('is-open');
+      btn.setAttribute('aria-expanded','false');
+      document.body.classList.remove('body-lock');
+    }
+
+    btn.addEventListener('click', ()=>{
+      const opened = layer.classList.contains('is-open');
+      opened ? closeDrawer() : openDrawer();
+    });
+
+    layer.addEventListener('click', (e)=>{
+      if (e.target.matches('[data-close], .mb-drawer__backdrop')) closeDrawer();
+    });
+
+    window.addEventListener('keydown', (e)=>{
+      if (e.key === 'Escape' && layer.classList.contains('is-open')) closeDrawer();
+    });
+  })();
 </script>
 </body>
 </html>
+
 
 
 
