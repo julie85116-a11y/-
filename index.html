@@ -32,28 +32,22 @@
   .decor--sun{inset:auto 0 0 auto; width:min(38vw,360px)}
   .layer{position:relative; z-index:1}
 
-  /* 導覽 */
-  .nav{
-    position:sticky; top:0; z-index:50; backdrop-filter:blur(8px);
-    background:color-mix(in oklab,var(--bg) 85%,white);
-    border-bottom:0 !important; box-shadow:none !important; outline:0;
-  }
+  /* 導覽（已移除左上連結抽屜與品牌區塊） */
+  .nav{position:sticky; top:0; z-index:50; backdrop-filter:blur(8px);
+       background:color-mix(in oklab,var(--bg) 85%,white);
+       border-bottom:0 !important; box-shadow:none !important; outline:0;}
   .nav::after{content:none !important;}
   .nav__inner{max-width:var(--maxw);margin:auto;padding:10px var(--gap);
     display:flex;align-items:center;justify-content:space-between}
-  /* ★ 隱藏品牌（紅框2） */
-  .brand{display:none !important;}
-  .brand__logo{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:#111;color:#fff;font-size:14px;font-weight:800}
+  .brand{display:none !important;}        /* ← 不顯示品牌區塊 */
+  .nav__menu{display:none !important;}    /* ← 不顯示漢堡 */
   .nav__links{display:flex;gap:18px;align-items:center}
   .nav__links a{opacity:.8;padding:6px 8px;border-radius:10px}
   .nav__links a:hover{background:rgba(0,0,0,.06);opacity:1}
   .nav__cta{padding:8px 14px;border-radius:999px;background:var(--accent);color:#fff;font-weight:700}
-  /* ★ 不再顯示漢堡按鈕與抽屜（紅框1來源） */
-  .nav__menu{display:none !important;}
 
   @media (max-width:860px){
-    /* 重要：行動版保留連結顯示（因為我們拿掉了抽屜） */
-    .nav__links{display:flex;}
+    .nav__links{display:flex;}            /* 行動版保留連結可用 */
   }
 
   /* Layout */
@@ -90,7 +84,7 @@
   .quote{font-size:clamp(18px,2.2vw,24px);font-weight:700}
   @media (max-width:900px){.about__grid{grid-template-columns:1fr}}
 
-  /* Flow（齊頭對齊） */
+  /* Flow（齊頭對齊 + JS微調） */
   .flow-graphic{background:linear-gradient(to bottom,transparent,#fff 40%,#fff); border-top:1px solid rgba(0,0,0,.08)}
   .fg-title{margin:0 0 28px; font-size:clamp(28px,4.5vw,42px); font-weight:800}
   .fg-steps{list-style:none; margin:0; padding:0; position:relative; display:grid; gap:28px}
@@ -104,13 +98,20 @@
     border-left:6px solid var(--flow); border-radius:14px; padding:18px 18px 14px;
     box-shadow:0 14px 30px rgba(0,0,0,.06)
   }
-  .fg-step:nth-child(odd) .fg-card{ grid-column:3 } /* 1/3/5 右側 */
+  .fg-step:nth-child(odd) .fg-card{ grid-column:3 } /* 1/3/5 在右邊 */
   .fg-card h3{ margin:0 0 6px; font-size:20px }
   .fg-card p{ margin:0; color:var(--ink) }
   .fg-tag{ display:inline-block; margin-top:10px; font-size:12px; color:#2f2f2f; background:#e9f3e4;
     border:1px solid color-mix(in oklab,var(--flow) 70%, #000 0%); padding:4px 8px; border-radius:999px }
 
-  .fg-center{ grid-column:2; justify-self:center; display:grid; gap:10px; place-items:center; align-self:start; margin-top:0 }
+  /* 中柱：加上變數位移 --fgOffset 給 JS 微調 */
+  .fg-center{
+    grid-column:2; justify-self:center; display:grid; gap:10px; place-items:center;
+    align-self:start;
+    --fgOffset: 0px;
+    transform: translateY(var(--fgOffset));   /* ← 關鍵：用 JS 設定這個值 */
+    will-change: transform;
+  }
   .fg-badge{
     width:86px; height:86px; border-radius:50%; display:grid; place-items:center;
     background:radial-gradient(circle at 30% 30%,#ffffff 0 30%,#f7fbf4 31% 100%);
@@ -124,7 +125,7 @@
   @media (max-width:780px){
     .fg-step{ grid-template-columns: 72px 1fr }
     .fg-steps::before{ left:36px; transform:none }
-    .fg-center{ grid-column:1; margin-top:0 }
+    .fg-center{ grid-column:1 }
     .fg-badge{ width:66px; height:66px }
     .fg-icon{ width:34px; height:34px }
     .fg-card{ grid-column:2; border-left-width:4px; padding:16px }
@@ -166,7 +167,7 @@
 </head>
 <body>
 
-  <!-- 背景裝飾 -->
+  <!-- 裝飾背景 -->
   <div class="decor decor--u" aria-hidden="true">
     <svg viewBox="0 0 300 360" width="100%" height="100%">
       <g stroke="#000" stroke-width="3" fill="none" opacity=".55">
@@ -200,10 +201,10 @@
   </div>
 
   <div class="layer">
-    <!-- 導覽（品牌已隱藏／抽屜移除） -->
+    <!-- 導覽（品牌/抽屜已移除） -->
     <nav class="nav">
       <div class="nav__inner">
-        <div class="brand"><!-- 已隱藏 --></div>
+        <div class="brand"></div>
         <div class="nav__links">
           <a href="#home">Home</a>
           <a href="#about">公司簡介</a>
@@ -213,7 +214,6 @@
         </div>
         <div class="nav__menu" id="menuBtn" aria-label="開啟選單">☰</div>
       </div>
-      <!-- 抽屜 .drawer 已移除 -->
     </nav>
 
     <!-- Home -->
@@ -252,7 +252,7 @@
       </div>
     </section>
 
-    <!-- Flow（齊頭對齊保持） -->
+    <!-- Flow -->
     <section id="flow" class="flow-graphic">
       <div class="container">
         <h2 class="fg-title">服務流程</h2>
@@ -360,7 +360,6 @@
   // 年份
   document.getElementById('y').textContent = new Date().getFullYear();
 
-  // 這版已移除抽屜，因此不再綁定 menu/drawer
   // 平滑捲動
   document.querySelectorAll('a[href^="#"]').forEach(a=>{
     a.addEventListener('click', e=>{
@@ -371,8 +370,31 @@
       }
     });
   });
+
+  // ====== 服務流程「齊頭對齊」強制校正 ======
+  function alignFlow(){
+    const steps = document.querySelectorAll('.fg-step');
+    steps.forEach(step=>{
+      const card   = step.querySelector('.fg-card');
+      const center = step.querySelector('.fg-center');
+      if(!card || !center) return;
+
+      // 先重置位移再量測，避免累積誤差
+      center.style.setProperty('--fgOffset','0px');
+
+      const ct = card.getBoundingClientRect().top;
+      const st = center.getBoundingClientRect().top;
+      const delta = Math.round(ct - st);           // 需要往下位移多少
+      center.style.setProperty('--fgOffset', delta + 'px');
+    });
+  }
+  // 初次執行 + 視窗尺寸改變時重新校正
+  window.addEventListener('load', alignFlow);
+  window.addEventListener('resize', ()=>{ requestAnimationFrame(alignFlow); });
+  window.addEventListener('orientationchange', ()=>{ setTimeout(alignFlow, 50); });
 </script>
 </body>
 </html>
+
 
 
