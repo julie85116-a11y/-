@@ -163,6 +163,23 @@
     h1{line-height:1.08} h2{line-height:1.15}
   }
   @media (prefers-reduced-motion:reduce){ *{transition:none!important; animation:none!important} }
+  <style>
+    :root{ /* 你原本的變數 */ }
+
+    /* 你原本的很多樣式 … */
+    h1{ /* 你原本的 h1 設定 */ }
+    h1 .en{ /* 你原本的英文行設定 */ }
+
+    /* ⬇️ 把這段加在這裡（建議放在 h1 的設定後面） */
+    h1 .zh{
+      display:block;          /* 中文在上一行，與英文分開 */
+      white-space:nowrap;     /* 不自動換行 */
+      word-break:keep-all;    /* 中文不要字字斷行 */
+      line-height:1.05;
+    }
+    @media (max-width:780px){
+      h1 .zh{ font-size:clamp(28px,7.5vw,56px); }  /* 小螢幕自動縮字，仍維持同一行 */
+    }
 </style>
 </head>
 <body>
@@ -221,8 +238,8 @@
       <div class="container hero__grid">
         <div class="hero__card">
           <h1>
-            百集實業有限公司
-            <span class="en">Bai&nbsp;Gi<br>Industrial&nbsp;Co.,<br>Ltd.</span>
+            <span class="zh">百集實業有限公司</span>
+            <span class="en">Bai&nbsp;Gi<br>Industrial&nbsp;Co.,Ltd.</span>
           </h1>
           <p class="lead">打破禮贈品的被動服務，提供<strong>引導式、共創式、從零開始</strong>的整合方案，讓沒有前例也能安心起步。</p>
         </div>
