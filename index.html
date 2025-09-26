@@ -180,6 +180,60 @@
     @media (max-width:780px){
       h1 .zh{ font-size:clamp(28px,7.5vw,56px); }  /* 小螢幕自動縮字，仍維持同一行 */
     }
+    /* === RWD 強化（請加在 <style> 的最後） === */
+
+/* 中文標題固定同一行（與英文分兩塊） */
+h1 .zh{
+  display:block;
+  white-space:nowrap;     /* 不自動換行 */
+  word-break:keep-all;    /* CJK 不逐字斷行 */
+  line-height:1.05;
+}
+@media (max-width:780px){
+  h1 .zh{ font-size:clamp(26px,7vw,52px); }
+}
+
+/* 小螢幕導覽：可以橫向滑動，點擊區更大 */
+@media (max-width:760px){
+  .nav__inner{ gap:8px; }
+  .nav__links{
+    flex-wrap:nowrap;               /* 不換行 */
+    overflow-x:auto;                /* 可左右滑動 */
+    -webkit-overflow-scrolling:touch;
+    gap:12px;
+    padding-bottom:4px;
+    scrollbar-width:none;
+  }
+  .nav__links::-webkit-scrollbar{ display:none; }
+  .nav__links a{ padding:10px 12px; border-radius:999px; background:rgba(0,0,0,.03); }
+  .nav__cta{ white-space:nowrap; }
+}
+
+/* 平板與以下：段落更好讀、卡片圓角一致 */
+@media (max-width:992px){
+  p{ line-height:1.75; }
+  .about__card, .fg-card, .cta .card{ border-radius:16px; }
+}
+
+/* 極小螢幕：單欄作品集、點擊區達 44px */
+@media (max-width:560px){
+  .portfolio .grid{ grid-template-columns:1fr; }
+  a, button, .btn{ min-height:44px; }
+}
+
+/* iOS 瀏海安全區 */
+@supports (padding:max(0px)){
+  body{
+    padding-left:max(0px, env(safe-area-inset-left));
+    padding-right:max(0px, env(safe-area-inset-right));
+  }
+}
+
+/* 鍵盤可視焦點（無障礙） */
+:focus-visible{
+  outline:3px solid color-mix(in oklab, var(--flow) 70%, #000 0%);
+  outline-offset:3px;
+}
 </style>
 </head>
 <body>
