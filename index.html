@@ -32,23 +32,34 @@
   .decor--sun{inset:auto 0 0 auto; width:min(38vw,360px)}
   .layer{position:relative; z-index:1}
 
-  /* 導覽（已移除左上連結抽屜與品牌區塊） */
-  .nav{position:sticky; top:0; z-index:50; backdrop-filter:blur(8px);
-       background:color-mix(in oklab,var(--bg) 85%,white);
-       border-bottom:0 !important; box-shadow:none !important; outline:0;}
-  .nav::after{content:none !important;}
-  .nav__inner{max-width:var(--maxw);margin:auto;padding:10px var(--gap);
-    display:flex;align-items:center;justify-content:space-between}
-  .brand{display:none !important;}        /* ← 不顯示品牌區塊 */
-  .nav__menu{display:none !important;}    /* ← 不顯示漢堡 */
-  .nav__links{display:flex;gap:18px;align-items:center}
-  .nav__links a{opacity:.8;padding:6px 8px;border-radius:10px}
+  /* ===== 導覽：所有裝置都維持橫向，窄螢幕可左右滑動 ===== */
+  .nav{
+    position:sticky; top:0; z-index:50; backdrop-filter:blur(8px);
+    background:color-mix(in oklab,var(--bg) 85%,white);
+    border-bottom:0; box-shadow:none; outline:0;
+  }
+  .nav__inner{
+    max-width:var(--maxw); margin:auto; padding:10px var(--gap);
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+  }
+  .brand{display:none;}      /* 依你的需求隱藏品牌區塊 */
+  .nav__menu{display:none;}  /* 不顯示漢堡 */
+  .nav__links{
+    display:flex; align-items:center; gap:18px;
+    flex-wrap:nowrap;            /* 不換行，維持橫向 */
+    overflow-x:auto;             /* 小螢幕可以左右滑 */
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;        /* 隱藏 Firefox 捲軸 */
+    mask-image: linear-gradient(90deg, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+  }
+  .nav__links::-webkit-scrollbar{ display:none; }  /* 隱藏 WebKit 捲軸 */
+  .nav__links a{
+    opacity:.85; padding:8px 12px; border-radius:999px;
+    white-space:nowrap;          /* 文字不換行 */
+    background:rgba(0,0,0,.03);
+  }
   .nav__links a:hover{background:rgba(0,0,0,.06);opacity:1}
   .nav__cta{padding:8px 14px;border-radius:999px;background:var(--accent);color:#fff;font-weight:700}
-
-  @media (max-width:860px){
-    .nav__links{display:flex;}            /* 行動版保留連結可用 */
-  }
 
   /* Layout */
   section{padding:clamp(56px,10vw,120px) var(--gap)}
@@ -62,6 +73,17 @@
     font-size:clamp(40px,7vw,92px); line-height:1.06; letter-spacing:.5px; font-weight:800;
   }
   h1 .en{display:block; line-height:1.05}
+  /* 中文標題固定同一行（與英文分兩塊） */
+  h1 .zh{
+    display:block;
+    white-space:nowrap;   /* 不自動換行 */
+    word-break:keep-all;  /* CJK 不逐字斷行 */
+    line-height:1.05;
+  }
+  @media (max-width:780px){
+    h1 .zh{ font-size:clamp(26px,7vw,52px); }
+  }
+
   h2{font-size:clamp(28px,4vw,44px);font-weight:800}
   .lead{font-size:clamp(16px,2.1vw,22px);color:#222;max-width:820px}
   .muted{color:var(--muted)}
@@ -84,7 +106,7 @@
   .quote{font-size:clamp(18px,2.2vw,24px);font-weight:700}
   @media (max-width:900px){.about__grid{grid-template-columns:1fr}}
 
-  /* Flow（齊頭對齊 + JS微調） */
+  /* Flow（齊頭對齊 + JS 微調） */
   .flow-graphic{background:linear-gradient(to bottom,transparent,#fff 40%,#fff); border-top:1px solid rgba(0,0,0,.08)}
   .fg-title{margin:0 0 28px; font-size:clamp(28px,4.5vw,42px); font-weight:800}
   .fg-steps{list-style:none; margin:0; padding:0; position:relative; display:grid; gap:28px}
@@ -104,12 +126,11 @@
   .fg-tag{ display:inline-block; margin-top:10px; font-size:12px; color:#2f2f2f; background:#e9f3e4;
     border:1px solid color-mix(in oklab,var(--flow) 70%, #000 0%); padding:4px 8px; border-radius:999px }
 
-  /* 中柱：加上變數位移 --fgOffset 給 JS 微調 */
   .fg-center{
     grid-column:2; justify-self:center; display:grid; gap:10px; place-items:center;
     align-self:start;
     --fgOffset: 0px;
-    transform: translateY(var(--fgOffset));   /* ← 關鍵：用 JS 設定這個值 */
+    transform: translateY(var(--fgOffset));
     will-change: transform;
   }
   .fg-badge{
@@ -151,8 +172,11 @@
   .foot{max-width:var(--maxw); margin:auto; display:flex; justify-content:space-between; gap:18px; align-items:center}
   @media (max-width:640px){ .foot{flex-direction:column; align-items:flex-start} }
 
-  @media (max-width:1200px){ .container{padding-left:10px; padding-right:10px} }
-  @media (max-width:992px){ .lead{max-width:100%} .about__card ul{padding-left:18px} }
+  /* 通用 RWD 強化 */
+  @media (max-width:992px){
+    p{ line-height:1.75; }
+    .about__card, .fg-card, .cta .card{ border-radius:16px; }
+  }
   @media (max-width:768px){
     .hero{min-height:60svh}
     .hero__visual{aspect-ratio:3/2}
@@ -162,78 +186,16 @@
     .btn,.btn--ghost{width:100%; text-align:center; padding:14px 18px}
     h1{line-height:1.08} h2{line-height:1.15}
   }
-  @media (prefers-reduced-motion:reduce){ *{transition:none!important; animation:none!important} }
-  <style>
-    :root{ /* 你原本的變數 */ }
-
-    /* 你原本的很多樣式 … */
-    h1{ /* 你原本的 h1 設定 */ }
-    h1 .en{ /* 你原本的英文行設定 */ }
-
-    /* ⬇️ 把這段加在這裡（建議放在 h1 的設定後面） */
-    h1 .zh{
-      display:block;          /* 中文在上一行，與英文分開 */
-      white-space:nowrap;     /* 不自動換行 */
-      word-break:keep-all;    /* 中文不要字字斷行 */
-      line-height:1.05;
+  @supports (padding:max(0px)){
+    body{
+      padding-left:max(0px, env(safe-area-inset-left));
+      padding-right:max(0px, env(safe-area-inset-right));
     }
-    @media (max-width:780px){
-      h1 .zh{ font-size:clamp(28px,7.5vw,56px); }  /* 小螢幕自動縮字，仍維持同一行 */
-    }
-    /* === RWD 強化（請加在 <style> 的最後） === */
-
-/* 中文標題固定同一行（與英文分兩塊） */
-h1 .zh{
-  display:block;
-  white-space:nowrap;     /* 不自動換行 */
-  word-break:keep-all;    /* CJK 不逐字斷行 */
-  line-height:1.05;
-}
-@media (max-width:780px){
-  h1 .zh{ font-size:clamp(26px,7vw,52px); }
-}
-
-/* 小螢幕導覽：可以橫向滑動，點擊區更大 */
-@media (max-width:760px){
-  .nav__inner{ gap:8px; }
-  .nav__links{
-    flex-wrap:nowrap;               /* 不換行 */
-    overflow-x:auto;                /* 可左右滑動 */
-    -webkit-overflow-scrolling:touch;
-    gap:12px;
-    padding-bottom:4px;
-    scrollbar-width:none;
   }
-  .nav__links::-webkit-scrollbar{ display:none; }
-  .nav__links a{ padding:10px 12px; border-radius:999px; background:rgba(0,0,0,.03); }
-  .nav__cta{ white-space:nowrap; }
-}
-
-/* 平板與以下：段落更好讀、卡片圓角一致 */
-@media (max-width:992px){
-  p{ line-height:1.75; }
-  .about__card, .fg-card, .cta .card{ border-radius:16px; }
-}
-
-/* 極小螢幕：單欄作品集、點擊區達 44px */
-@media (max-width:560px){
-  .portfolio .grid{ grid-template-columns:1fr; }
-  a, button, .btn{ min-height:44px; }
-}
-
-/* iOS 瀏海安全區 */
-@supports (padding:max(0px)){
-  body{
-    padding-left:max(0px, env(safe-area-inset-left));
-    padding-right:max(0px, env(safe-area-inset-right));
+  :focus-visible{
+    outline:3px solid color-mix(in oklab, var(--flow) 70%, #000 0%);
+    outline-offset:3px;
   }
-}
-
-/* 鍵盤可視焦點（無障礙） */
-:focus-visible{
-  outline:3px solid color-mix(in oklab, var(--flow) 70%, #000 0%);
-  outline-offset:3px;
-}
 </style>
 </head>
 <body>
@@ -272,7 +234,7 @@ h1 .zh{
   </div>
 
   <div class="layer">
-    <!-- 導覽（品牌/抽屜已移除） -->
+    <!-- 導覽（橫向＋可滑動） -->
     <nav class="nav">
       <div class="nav__inner">
         <div class="brand"></div>
@@ -283,7 +245,7 @@ h1 .zh{
           <a href="#portfolio">作品集</a>
           <a href="#contact" class="nav__cta">預約初談</a>
         </div>
-        <div class="nav__menu" id="menuBtn" aria-label="開啟選單">☰</div>
+        <div class="nav__menu" aria-hidden="true"></div>
       </div>
     </nav>
 
@@ -442,30 +404,27 @@ h1 .zh{
     });
   });
 
-  // ====== 服務流程「齊頭對齊」強制校正 ======
+  // 服務流程：中柱與卡片齊頭
   function alignFlow(){
     const steps = document.querySelectorAll('.fg-step');
     steps.forEach(step=>{
       const card   = step.querySelector('.fg-card');
       const center = step.querySelector('.fg-center');
       if(!card || !center) return;
-
-      // 先重置位移再量測，避免累積誤差
       center.style.setProperty('--fgOffset','0px');
-
       const ct = card.getBoundingClientRect().top;
       const st = center.getBoundingClientRect().top;
-      const delta = Math.round(ct - st);           // 需要往下位移多少
+      const delta = Math.round(ct - st);
       center.style.setProperty('--fgOffset', delta + 'px');
     });
   }
-  // 初次執行 + 視窗尺寸改變時重新校正
   window.addEventListener('load', alignFlow);
   window.addEventListener('resize', ()=>{ requestAnimationFrame(alignFlow); });
   window.addEventListener('orientationchange', ()=>{ setTimeout(alignFlow, 50); });
 </script>
 </body>
 </html>
+
 
 
 
